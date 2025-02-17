@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import axios from "axios";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("access_token")) {
       axios
@@ -24,7 +25,6 @@ const HomePage = () => {
     }
   }, []);
 
-  const navigate = useNavigate();
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center ">
       <div className="container text-center">

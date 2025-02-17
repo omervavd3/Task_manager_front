@@ -17,22 +17,27 @@ const schema = z.object({
 });
 
 type dataForAxios = {
-    title: string;
-    description: string;
-    date: string;
-    isComplete?: boolean;
-    userId?: string;
-}
+  title: string;
+  description: string;
+  date: string;
+  isComplete?: boolean;
+  userId?: string;
+};
 
 type FormData = z.infer<typeof schema>;
 
 interface AddTaskProps {
-    userId: string;
-    renderTasks: () => void;
-    toggleShowAddTask: () => void;
+  userId: string;
+  renderTasks: () => void;
+  toggleShowAddTask: () => void;
 }
 
-const AddTask:FC<AddTaskProps> = ({userId, renderTasks, toggleShowAddTask}) => {
+const AddTask: FC<AddTaskProps> = ({
+  userId,
+  renderTasks,
+  toggleShowAddTask,
+}) => {
+
   const {
     register,
     handleSubmit,
@@ -60,6 +65,7 @@ const AddTask:FC<AddTaskProps> = ({userId, renderTasks, toggleShowAddTask}) => {
         console.error(error);
       });
   };
+
   return (
     <div className="d-flex align-items-center justify-content-center ">
       <form onSubmit={handleSubmit(onSubmit)}>

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
 import "../custom.css";
+import Alert from "./Alert";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -16,6 +17,7 @@ type FormData = z.infer<typeof schema>;
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -31,17 +33,27 @@ const SignUp = () => {
       .post("http://localhost:3000/user/register", formData)
       .then((response) => {
         console.log(response);
-        if (response.status === 201) {
+        if (response.status == 201) {
           navigate("/login");
+        } else {
+          console.log("failed");
+          alert("User name or email already exists");
         }
       })
       .catch((error) => {
         console.error(error);
+        setShowAlert(true);
+        const timer = setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+    
+        return () => clearTimeout(timer);
       });
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
+      {showAlert && (<Alert message="User name or email already exists" type="danger"/>)}
       <div className="card p-4 shadow-sm" style={{ width: "400px" }}>
         <h2 className="text-center mb-4">Sign Up</h2>
         <form onSubmit={handleSubmit(onSubmit)}>

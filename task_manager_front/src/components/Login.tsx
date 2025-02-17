@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import "../custom.css";
+import Alert from "./Alert";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -14,13 +15,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const Login = () => {
-
+  const [showAlert, setShowAlert] = useState(false);
   useEffect(() => {
-    if (localStorage.getItem("access_token") == null  ) {
+    if (localStorage.getItem("access_token") == null) {
       localStorage.setItem("access_token", "");
       localStorage.setItem("userId", "");
     }
-  },[])
+  }, []);
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -43,21 +44,32 @@ const Login = () => {
       .post("http://localhost:3000/user/login", data)
       .then((response) => {
         console.log(response);
-        localStorage.setItem("access_token", response.data.accessToken);
-        localStorage.setItem("userId", response.data.userId);
-        navigate(`/user/${response.data.userId}`);
+        if (response.status == 200) {
+          localStorage.setItem("access_token", response.data.accessToken);
+          localStorage.setItem("userId", response.data.userId);
+          navigate(`/user/${response.data.userId}`);
+        }
       })
       .catch((error) => {
         console.error(error);
+        setShowAlert(true);
+        const timer = setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+    
+        return () => clearTimeout(timer);
       });
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
+      {showAlert && <Alert message="Invalid email or password" type="danger" />}
       <div className="card p-4 shadow-sm" style={{ width: "400px" }}>
         <h2 className="text-center mb-4">Log In</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <label htmlFor="email" className="form-label">Email</label>
+          <label htmlFor="email" className="form-label">
+            Email
+          </label>
           <input
             id="email"
             {...register("email")}
@@ -65,9 +77,13 @@ const Login = () => {
             placeholder="Enter email"
             className={`form-control ${errors.email ? "is-invalid" : ""}`}
           />
-          {errors.email && <p className="text-danger">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="text-danger">{errors.email.message}</p>
+          )}
 
-          <label htmlFor="password" className="form-label">Password</label>
+          <label htmlFor="password" className="form-label">
+            Password
+          </label>
           <input
             id="password"
             {...register("password")}
@@ -87,7 +103,9 @@ const Login = () => {
               Show Password
             </label>
           </div>
-          {errors.password && <p className="text-danger">{errors.password.message}</p>}
+          {errors.password && (
+            <p className="text-danger">{errors.password.message}</p>
+          )}
 
           <button type="submit" className="btn btn-primary w-100 mt-3">
             Log In

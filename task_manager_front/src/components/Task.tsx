@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
 import axios from "axios";
+import Alert from "./Alert";
 
 interface TaskProps {
   title: string;
@@ -10,7 +11,17 @@ interface TaskProps {
   renderTasks: () => void;
 }
 
-const Task: FC<TaskProps> = ({ title, description, date, isComplete, id, renderTasks }) => {
+const Task: FC<TaskProps> = ({
+  title,
+  description,
+  date,
+  isComplete,
+  id,
+  renderTasks,
+}) => {
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
   const [complete, setComplete] = useState(isComplete);
   const handleComplete = () => {
     axios
@@ -42,14 +53,26 @@ const Task: FC<TaskProps> = ({ title, description, date, isComplete, id, renderT
       .then((response) => {
         console.log(response);
         renderTasks();
+        setAlertMessage("Task deleted successfully");
+        setAlertType("info");
       })
       .catch((error) => {
         console.error(error);
+        setAlertMessage("Error deleting task");
+        setAlertType("danger");
       });
+
+    setShowAlert(true);
+    const timer = setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
   };
 
   return (
     <div className="list-group-item d-flex justify-content-between align-items-center p-3 shadow-sm">
+        {showAlert && <Alert message={alertMessage} type={alertType} />}
       <div>
         <h5 className="fw-bold mb-1">{title}</h5>
         <p className="text-muted small mb-1">{description}</p>
@@ -76,7 +99,9 @@ const Task: FC<TaskProps> = ({ title, description, date, isComplete, id, renderT
             Complete
           </button>
         )}
-        <button className="btn btn-danger btn-sm" onClick={handleDelete}>Delete</button>
+        <button className="btn btn-danger btn-sm" onClick={handleDelete}>
+          Delete
+        </button>
       </div>
     </div>
   );
